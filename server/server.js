@@ -1,27 +1,29 @@
-import express from 'express';   /* 1.- importamos express  */
+import bodyParser from "body-parser";
+import cors from "cors";
+import * as dotenv from "dotenv";
+import express from "express";
+import passport from "passport";
+import passportConfig from "./config/passport.js";
+import connect from "./database/mongodb.js";
+import routes from "./routes/index.js";
 
-import mongoose from 'mongoose'; /* 6.- Importar mongoose */
 
-import cors from 'cors'; /* 9.- importar cors */
+dotenv.config();
 
-/* 5.- creamos el constructor del servidor y le asignamos un puerto */
-const PORT = 4000
+const PORT = process.env.PORT || 4000;
+const app = express();
+app.use(cors());
+app.use(bodyParser.json());
+app.use(passport.initialize());
+passportConfig(passport);
 
-const app = express();  /* 2.- Creamos el constructor */
+app.get("/", (req, res) => {
+  res.send("Hello World");
+});
+app.use("/", routes);
 
-app.use(cors); /* 10.- usamos cors */
+await connect();
 
-/* 7.- conectar con la base de datos mongodb */
-await mongoose.connect("mongodb+srv://Shigge:shigge123@cluster0.hb0olgd.mongodb.net/?retryWrites=true&w=majority")
-
-/* 8.- Si esta todo bien conectado se muestra el siguiente mensaje, de lo contrario mostrara un error */
-console.log("MongoDB connection is successful");
-
-app.get('/', (req, res) => {    /* 3.- creamos dos argumentos req y res y mandamos un texto "Hello World!" */
-    res.send ("Hello World!");
-})
-
-/* 4.- Iniciamos el servidor y le asignamos un puerto */
 app.listen(PORT, () => {
-    console.log("Server is running at http://localhost:4000");
+  console.log("Server is running at http://localhost:4000");
 });
